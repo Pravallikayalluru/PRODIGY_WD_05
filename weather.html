@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link href='https://fonts.googleapis.com/css?family=Caveat' rel='stylesheet'>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #fff;
+        }
+        input, button {
+            padding: 12px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e68900;
+        }
+        .weather-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+        h1 {
+            font-size: 32px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .weather-info p {
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        .pickup-line {
+            font-size: 30px;
+            margin-top: 20px;
+            font-style: italic;
+            color: #ffeb3b;
+            font-family:caveat;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌦️ Welcome to our Weather Hub 🌦️</h1>
+    <p class="pickup-line">"Are you a storm? Because you just took my breath away!" 😉</p>
+    
+    <input type="text" id="city" placeholder="Enter your city">
+    <button onclick="fetchWeather()">Check Weather</button>
+    <button onclick="getUserLocation()">📍 Know Your Location's Weather</button>
+    
+    <div class="weather-container" id="weather"></div>
+    
+    <script>
+        function fetchWeather(city) {
+            if (!city) {
+                city = document.getElementById('city').value;
+            }
+            if (!city) {
+                alert("Please enter a city name or use your location.");
+                return;
+            }
+
+            fetch(`https://wttr.in/${city}?format=%C~%t~%h~%w`)
+                .then(response => response.text())
+                .then(data => displayWeather(city, data))
+                .catch(error => alert("Error fetching weather data"));
+        }
+
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    fetch(`https://wttr.in/${latitude},${longitude}?format=%C~%t~%h~%w`)
+                        .then(response => response.text())
+                        .then(data => displayWeather("Your Location", data))
+                        .catch(error => alert("Error fetching weather data"));
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function displayWeather(location, data) {
+            const [condition, temp, humidity, wind] = data.split("~");
+            document.getElementById('weather').innerHTML = `
+                <h2>📍 ${location}</h2>
+                <p><strong>🌤️ Condition:</strong> ${condition}</p>
+                <p><strong>🌡️ Temperature:</strong> ${temp}</p>
+                <p><strong>💧 Humidity:</strong> ${humidity}</p>
+                <p><strong>🌬️ Wind Speed:</strong> ${wind}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
